@@ -1,9 +1,13 @@
-FROM openjdk:8
-ADD novel-admin.jar /root
+FROM eclipse-temurin:21-jre
+RUN useradd -m appuser
+WORKDIR /app
+COPY novel-admin.jar /app/novel-admin.jar
+RUN chown -R appuser:appuser /app
+USER appuser
 ENV dburl=""
 ENV username=""
 ENV	password=""
 ENV redishost = ""
 ENV redisport = ""
 ENV redispwd = ""
-ENTRYPOINT ["sh","-c","java -Dspring.datasource.url=${dburl} -Dspring.datasource.username=${username} -Dspring.datasource.password=${password} -Dspring.redis.host=${redishost} -Dspring.redis.port=${redisport} -Dspring.redis.password=${redispwd} -jar /root/novel-admin.jar"]
+ENTRYPOINT ["java -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver -Dspring.datasource.url=${dburl} -Dspring.datasource.username=${username} -Dspring.datasource.password=${password} -Dspring.data.redis.host=${redishost} -Dspring.data.redis.port=${redisport} -Dspring.data.redis.password=${redispwd} -jar /app/novel-admin.jar"]
