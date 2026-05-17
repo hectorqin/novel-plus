@@ -1,13 +1,12 @@
 FROM eclipse-temurin:21-jre
-RUN useradd -m appuser
+
 WORKDIR /app
-COPY novel-admin.jar /app/novel-admin.jar
-RUN chown -R appuser:appuser /app
-USER appuser
-ENV dburl=""
-ENV username=""
-ENV	password=""
-ENV redishost = ""
-ENV redisport = ""
-ENV redispwd = ""
-ENTRYPOINT ["java -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver -Dspring.datasource.url=${dburl} -Dspring.datasource.username=${username} -Dspring.datasource.password=${password} -Dspring.data.redis.host=${redishost} -Dspring.data.redis.port=${redisport} -Dspring.data.redis.password=${redispwd} -jar /app/novel-admin.jar"]
+
+COPY novel-admin.jar /app/
+
+# 默认关闭 ShardingSphere，保证旧版本兼容
+ENV JDBC_DRIVER=com.mysql.cj.jdbc.Driver
+
+ENTRYPOINT ["sh","-c","exec java \
+-Dspring.datasource.driver-class-name=${JDBC_DRIVER} \
+-jar /app/novel-admin.jar"]
