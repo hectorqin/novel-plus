@@ -118,3 +118,19 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/novel-crawl:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/novel-crawl:${{ github.ref_name }}
+
+      # 解压 SQL 文件
+      - name: Unzip MySQL SQL File
+        run: |
+          unzip -o ./doc/sql/novel_plus_data.sql.zip -d ./doc/sql/
+
+      # 构建并推送 mysql-novel-plus 镜像
+      - name: Build and Push mysql-novel-plus Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./doc/sql
+          file: ./doc/sql/Dockerfile
+          push: true
+          tags: |
+            201206030/mysql-novel-plus:latest
+            201206030/mysql-novel-plus:${{ github.ref_name }}
